@@ -52,14 +52,15 @@ router.post('/', upload.single('photo'), async (req, res) => {
                 image: req.file,
                 cloud_image: result,
                 tags: tags.body.description.tags,
-                color: tags.body.color
+                color: tags.body.color,
+                caption: tags.body.description.captions
             });
-            cloudinary.uploader.add_tag(tags.body.description.tags[0], result.public_id, async function () {
+            cloudinary.uploader.add_tag(tags.body.description.tags[0], result.public_id, async function (id) {
                 try {
                     let savedImage = await image.save();
                     res.status(200).send({
                         msg: "Success saving image",
-                        image: savedImage
+                        image: savedImage,
                     });
                 } catch {
                     res.status(500).send({
@@ -96,45 +97,12 @@ function azureTags(file) {
                 console.log('Error: ', error);
                 reject();
             };
-
-            console.log("Tags --->", JSON.parse(body));
-            resolve({
-                body: JSON.parse(body)
-            });
+            body=JSON.parse(body);
+            resolve({body});
         });
     });
 }
 
-
-router.get('/scan', (req, res) => {
-    const subscriptionKey = 'd765a568addd4ecc843cc1199f19b6d2';
-    const uriBase = 'https://southeastasia.api.cognitive.microsoft.com//vision/v2.0/analyze';
-    const imageUrl = 'http://upload.wikimedia.org/wikipedia/commons/3/3c/Shaki_waterfall.jpg';
-    const params = {
-        'visualFeatures': 'Categories,Description,Color',
-        'details': '',
-        'language': 'en'
-    };
-    const options = {
-        uri: uriBase,
-        qs: params,
-        body: '{"url": ' + '"' + imageUrl + '"}',
-        headers: {
-            'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key': subscriptionKey
-        }
-    };
-
-    request.post(options, (error, response, body) => {
-        if (error) {
-            console.log('Error: ', error);
-            return;
-        };
-        res.send({
-            body: JSON.parse(body)
-        })
-    });
-});
 
 
 module.exports = router;

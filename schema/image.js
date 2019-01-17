@@ -8,8 +8,8 @@ var ImageSchema = new mongoose.Schema({
     image: JSON,
     cloud_image: JSON,
     tags: [String],
-    color: Object,
-    caption: Object
+    color: JSON,
+    caption: [JSON]
 });
 
 var image = mongoose.model('image',ImageSchema);
